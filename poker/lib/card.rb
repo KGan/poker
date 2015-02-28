@@ -66,6 +66,14 @@ class Card
   end
 
   # Compares two cards to see if they're equal in suit & value.
+  def >(other_card)
+    poker_value > other_card.poker_value
+  end
+
+  def <(other_card)
+    poker_value < other_card.poker_value
+  end
+
   def ==(other_card)
     return false if other_card.nil?
 

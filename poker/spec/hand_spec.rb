@@ -4,6 +4,34 @@ require 'humanize'
 
 describe Hand do
 
+  context "Initialize hand" do
+    subject(:hands) { hand('as ks qs js 10s') }
+    it "should initialize the hand to five cards" do
+      expect(hands.num_cards).to eq(5)
+    end
+  end
+
+  context "#hit" do
+
+    it "should hit until five cards" do
+      deck = Deck.new
+      hand = Hand.deal_from(deck, 2)
+      hand.hit(deck)
+      expect(hand.num_cards).to eq(5)
+    end
+  end
+
+  context '#return_cards' do
+    it "should return cards to the deck" do
+      deck = Deck.new
+      cards_to_return = deck.take(3)
+      hand = Hand.new(cards_to_return)
+      hand.hit(deck)
+      hand.return_cards(deck, cards_to_return)
+      expect(hand.cards).to_not include(*cards_to_return)
+      expect(hand.num_cards).to eq(2)
+    end
+  end
 
   context "Hand Evaluation" do
     #straight flush > 4kind > full house > flush > straight, 3kind, 2pair, pair, 1card high
@@ -35,36 +63,35 @@ describe Hand do
     let(:card_high_kicker) { hand('ad 10d 6h 8s 2d') }
     context "strict win by hand category value" do
       it 'should rank successive hands correctly' do
-        expect(straight_flush).to have_higher_value(four_kind)
-        expect(four_kind).to have_higher_value(full_house)
-        expect(full_house).to have_higher_value(flush)
-        expect(flush).to have_higher_value(straight)
-        expect(straight).to have_higher_value(three_kind)
-        expect(three_kind).to have_higher_value(two_pair)
-        expect(two_pair).to have_higher_value(pair)
-        expect(pair).to have_higher_value(card_high)
+        expect(straight_flush).to have_higher_value_than(four_kind)
+        expect(four_kind).to have_higher_value_than(full_house)
+        expect(full_house).to have_higher_value_than(flush)
+        expect(flush).to have_higher_value_than(straight)
+        expect(straight).to have_higher_value_than(three_kind)
+        expect(three_kind).to have_higher_value_than(two_pair)
+        expect(two_pair).to have_higher_value_than(pair)
+        expect(pair).to have_higher_value_than(card_high)
       end
     end
 
     context "within-category primary comparison" do
       it 'should rank higher hands of the same category' do
-        expect(straight_flush).to have_higher_value(straight_flush_low)
-        expect(four_kind).to have_higher_value(four_kind_low)
-        expect(full_house).to have_higher_value(full_house_low)
-        expect(flush).to have_higher_value(flush_low)
-        expect(straight).to have_higher_value(straight_low)
-        expect(three_kind).to have_higher_value(three_kind_low)
-        expect(two_pair).to have_higher_value(two_pair_low)
-        expect(pair).to have_higher_value(pair_low)
-        expect(card_high).to have_higher_value(card_high_low)
+        expect(straight_flush).to have_higher_value_than(straight_flush_low)
+        expect(four_kind).to have_higher_value_than(four_kind_low)
+        expect(full_house).to have_higher_value_than(full_house_low)
+        expect(flush).to have_higher_value_than(flush_low)
+        expect(straight).to have_higher_value_than(straight_low)
+        expect(three_kind).to have_higher_value_than(three_kind_low)
+        expect(two_pair).to have_higher_value_than(two_pair_low)
+        expect(pair).to have_higher_value_than(pair_low)
       end
     end
 
     context "within-category secondary comparison" do
       it 'should account for kickers' do
-        expect(two_pair).to have_higher_value(two_pair_kicker)
-        expect(pair).to have_higher_value(pair_kicker)
-        expect(card_high).to have_higher_value(card_high_kicker)
+        expect(two_pair).to have_higher_value_than(two_pair_kicker)
+        expect(pair).to have_higher_value_than(pair_kicker)
+        expect(card_high).to have_higher_value_than(card_high_kicker)
       end
     end
 
